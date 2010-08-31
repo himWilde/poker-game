@@ -1,3 +1,5 @@
+//sdfkjsjkldfskldfjl
+
 function initCardGame()
 {
 	var deck = newDeck();	
