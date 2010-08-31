@@ -1,5 +1,3 @@
-//sdfkjsjkldfskldfjl
-
 function initCardGame()
 {
 	var deck = newDeck();	
@@ -100,8 +98,46 @@ function checkForFlush(cards)
 }
 
 function checkForStraight(cards)
-{
-	return false;
+{	
+	cards[0].value = 1;
+	cards[1].value = 2;
+	cards[2].value = 3;
+	cards[3].value = 4;
+	cards[4].value = 5;
+	cards[5].value = 6;
+	cards[6].value = 10;
+	
+	var highCard = 0;
+	//Sort Numerically
+    for(var i = 1; i < cards.length; i++)
+    {
+        var pos = i;
+        while(pos != 0){
+            if(cards[pos].value < cards[pos-1].value){
+                temp = cards[pos].value;
+                cards[pos].value = cards[pos-1].value;
+                cards[pos-1].value = temp;
+            }
+            pos--;
+        }
+    }
+
+    //Test for Straight    
+    var count = 0;
+    
+    for(var i = 0; i < cards.length - 1; i++)
+    {
+        if(cards[i].value == cards[i+1].value - 1)
+        {
+        	count++;
+        	highCard = cards[i].value;
+        }
+    }
+    
+    console.log(highCard);
+    
+    if(count >= 4)return true
+    else return false;
 }
 
 function finalCards(r,p)
