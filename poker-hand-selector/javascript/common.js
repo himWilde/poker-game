@@ -15,22 +15,56 @@ function initCardGame()
 		addCardToStage(river[river.length - 1], 'river');
 	}	
 	
-	var cards = finalCards(player,river);
+	checkScore(player,river);
+}
+
+function checkScore(p,r)
+{
+	var cards = finalCards(p,r);
 	
-	console.log('Of a Kind: ' + checkForAKind(cards));
-	console.log('Flush: ' + checkForFlush(cards));
-	console.log('Straight: ' + checkForStraight(cards));
-	console.log('High Card: ' + findHighCard(cards));
+	p.score.flush = checkForFlush(cards);
+	p.score.straight = checkForStraight(cards);
+	p.score.fourKind = checkForAKind(cards,4);
+	p.score.threeKind = checkForAKind(cards,3);
+	p.score.pair = checkForAKind(cards,2);
+	p.score.highCard = findHighCard(cards);
+	
+	console.log(p.score);
+	console.log('High Card: ' + p.score.highCard.value + p.score.highCard.suit);
+	console.log('Pair: ' + p.score.pair.hit);
+	console.log('Three of a Kind: ' + p.score.threeKind.hit);
+	console.log('Four of a Kind: ' + p.score.fourKind.hit);
+	console.log('Straight: ' + p.score.straight.hit);
+	console.log('Flush: ' + p.score.flush.hit);
 }
 
 function newPlayer(name)
 {
 	var p = {
 		name: name,
-		cards: new Array()
+		cards: new Array(),
+		score: scoreHolder()
 	}
 	
 	return p;
+}
+
+function scoreHolder()
+{
+	var score = {		
+		royalFlush: false,
+		straightFlush: false,		
+		fourKind: false,
+		fullhouse: false,
+		flush: false,
+		straight: false,
+		threeKind: false,
+		twoPair: false,
+		pair: false,
+		highCard: false
+	}
+	
+	return score;
 }
 
 function newDeck()
@@ -78,61 +112,43 @@ function findHighCard(cards)
 {
 	var highCard = 0;
 	
-	if(cards[0].value == 1) highCard = cards[0].value + cards[0].suit;
-	else highCard = cards[6].value + cards[6].suit;
+	cards[0].value == 1 ? highCard = cards[0] : highCard = cards[6];
 	
 	return highCard;
 }
 
-function checkForAKind(cards)
-{	
-	var ofAKind = 'false';
-	var three = false;
-	var two = 0;
-	var fullHouse = false;
+function checkForAKind(cards,num)
+{		
+	var obj = Object;
+	var value = 0;
+	var count = 0;
 	
-	for(var i = 0; i < cards.length; i++)
-	{		
-		if(cards.length - i > 3 && cards[i].value == cards[i+1].value && cards[i].value == cards[i+2].value && cards[i].value == cards[i+3].value)
+	for(var i = 0; i < cards.length - (num-1); i++)
+	{	
+		for (var j = i+1; j <= i+(num-1); j++)
 		{
-			ofAKind = 'Four ' + cards[i].value + 's';
-			break;
-		}
-		
-		if(cards.length - i > 2 && cards[i].value == cards[i+1].value && cards[i].value == cards[i+2].value)
-		{
-			ofAKind = 'Three ' + cards[i].value + 's';
-			three = true;
-		}
-		
-		if(cards.length - i > 1 && three == false && two == 2 && cards[i].value == cards[i+1].value)
-		{
-			ofAKind = ofAKind + ' & Two ' + cards[i].value + 's';
-			two = 3;			
-		}
-		
-		if(cards.length - i > 1 && three == false && two == 1 && cards[i].value == cards[i+1].value)
-		{
-			ofAKind = ofAKind + ' & Two ' + cards[i].value + 's';
-			two = 2;			
-		}
-		
-		if(cards.length - i > 1 && three == false && two == 0 && cards[i].value == cards[i+1].value)
-		{
-			ofAKind = 'Two ' + cards[i].value + 's';
-			two = 1;			
-		}
-		
+			if(cards[i].value == cards[j].value)
+			{
+				count++;
+				value = cards[i].value;
+				
+				console.log(count);
+				
+				if(count == num) 
+				{
+					console.log('eh!');
+					return obj = { hit:true, value: value };
+				} 
+			}
+		}	
 	}
 	
-	//CHECK FOR FULL HOUSE
-	if(three == true && two >= 1)
-	{
-		fullHouse = true;
-		ofAKind = 'Full House!'
-	}
-	
-	return ofAKind;
+	return false;
+}
+
+function checkForTwoPair(cards)
+{
+	//TO DO
 }
 
 function checkForFlush(cards)
@@ -141,7 +157,7 @@ function checkForFlush(cards)
 	var s = 0;
 	var d = 0;
 	var c = 0;
-	
+		
 	for(var i = 0; i < cards.length; i++)
 	{
 		if(cards[i].suit == 'h') h++;
@@ -150,8 +166,18 @@ function checkForFlush(cards)
 		if(cards[i].suit == 'c') c++;
 	}
 	
-	//CHECK FOR STRAIGHT FLUSH HERE
-	if(h >= 5 || s >= 5 || d >= 5 || c >= 5) return true;
+	var obj = Object;
+	
+	if(h >= 5) return obj = { hit: true, suit: 'h' };
+	else return false;
+	
+	if(s >= 5) return obj = { hit: true, suit: 's' };
+	else return false;
+	
+	if(d >= 5) return obj = { hit: true, suit: 'd' };
+	else return false;
+	
+	if(c >= 5) return obj = { hit: true, suit: 'c' };
 	else return false;
 }
 
@@ -179,7 +205,9 @@ function checkForStraight(cards)
         }
     }
     
-    if(count >= 4)return true
+    var obj = Object;
+    
+    if(count >= 4) return obj = { hit: true, value: highCard };
     else return false;
 }
 
@@ -191,8 +219,10 @@ function finalCards(p,r)
     for(var i = 1; i < c.length; i++)
     {
         var a = i;
-        while(a != 0){
-            if(c[a].value < c[a-1].value){
+        while(a != 0)
+        {
+            if(c[a].value < c[a-1].value)
+            {
                 temp = c[a];
                 c[a] = c[a-1];
                 c[a-1] = temp;
