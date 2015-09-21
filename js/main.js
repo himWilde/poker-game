@@ -101,7 +101,7 @@ function addCardToStage(card, position)
 {
 	var img = document.createElement('img');	
 
-	img.setAttribute('src',"images/" + card.value + card.suit + ".gif");
+	img.setAttribute('src',"img/" + card.value + card.suit + ".gif");
 	img.setAttribute('width','71');
 	img.setAttribute('height','96');
 	
